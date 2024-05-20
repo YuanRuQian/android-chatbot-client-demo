@@ -22,9 +22,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import java.util.Date
 
 @Composable
-fun MessageItem(message: MessageModal) {
+fun MessageItem(message: Message) {
     if (message.sender == "User") {
         UserMessageItem(message)
     } else {
@@ -33,7 +34,7 @@ fun MessageItem(message: MessageModal) {
 }
 
 @Composable
-fun UserMessageItem(message: MessageModal) {
+fun UserMessageItem(message: Message) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -63,24 +64,18 @@ fun UserMessageItem(message: MessageModal) {
                 color = MaterialTheme.colorScheme.secondary
             )
             Spacer(modifier = Modifier.height(4.dp))
-            if (message.isLoading) {
-                Text(
-                    text = "Sending...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary
-                )
-            } else
-                Text(
-                    text = message.message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
+
+            Text(
+                text = message.message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
         }
     }
 }
 
 @Composable
-fun ChatbotMessageItem(message: MessageModal) {
+fun ChatbotMessageItem(message: Message) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -100,22 +95,14 @@ fun ChatbotMessageItem(message: MessageModal) {
                 textAlign = TextAlign.End
             )
             Spacer(modifier = Modifier.height(4.dp))
-            if (message.isLoading) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = "Waiting for response from Chatbot...",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textAlign = TextAlign.End
-                )
-            } else
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = message.message,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.End
-                )
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = message.message,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.End
+            )
         }
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -137,7 +124,7 @@ fun ChatbotMessageItem(message: MessageModal) {
 @Composable
 fun UserMessageItemPreview() {
     UserMessageItem(
-        message = MessageModal("Hello", "User", false)
+        message = Message(message = "Hello", sender = "User", date = Date())
     )
 }
 
@@ -145,6 +132,6 @@ fun UserMessageItemPreview() {
 @Composable
 fun ChatbotMessageItemPreview() {
     ChatbotMessageItem(
-        message = MessageModal("Hi there!", "Chatbot", false)
+        message = Message(message = "Hi there!", sender = "Chatbot", date = Date())
     )
 }

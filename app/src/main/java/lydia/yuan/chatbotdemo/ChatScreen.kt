@@ -1,9 +1,11 @@
 package lydia.yuan.chatbotdemo
 
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.*
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.dp
 fun ChatScreen(viewModel: ChatbotViewModel, paddingValues: PaddingValues) {
 
     val messages by viewModel.messages.collectAsState(initial = emptyList())
+    val listState = rememberLazyListState()
 
     Box(
         modifier = Modifier
@@ -27,7 +30,8 @@ fun ChatScreen(viewModel: ChatbotViewModel, paddingValues: PaddingValues) {
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            state = listState
         ) {
             stickyHeader {
                 Text(
@@ -40,7 +44,13 @@ fun ChatScreen(viewModel: ChatbotViewModel, paddingValues: PaddingValues) {
                 )
             }
             items(messages.size) { index ->
-                MessageItem(message = messages[index])
+                Row(
+                    Modifier.animateItemPlacement(
+                        tween(durationMillis = 1000)
+                    ).padding(bottom = if(index == messages.size - 1) 64.dp else 0.dp)
+                ) {
+                    MessageItem(message = messages[index])
+                }
             }
         }
 
@@ -52,6 +62,11 @@ fun ChatScreen(viewModel: ChatbotViewModel, paddingValues: PaddingValues) {
             verticalArrangement = Arrangement.Center
         ) {
             ChatRow(onSend = viewModel::sendMessage)
+        }
+
+        LaunchedEffect(messages) {
+            // Scroll to the last item when the list changes
+            listState.scrollToItem(maxOf(messages.size - 1, 0))
         }
     }
 }
@@ -82,7 +97,9 @@ fun ChatRow(onSend: (String, () -> Unit, () -> Unit) -> Unit) {
 
         TextField(
             enabled = textFieldEnabled.value,
-            modifier = Modifier.fillMaxWidth(0.85f).padding(horizontal = 8.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.85f)
+                .padding(horizontal = 8.dp),
             value = messageText.value,
             onValueChange = { messageText.value = it },
             placeholder = { Text("Enter your message") },
